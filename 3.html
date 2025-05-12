@@ -1,0 +1,346 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>最后三杯（手机版）</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display&display=swap" rel="stylesheet" />
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: #111;
+      color: #fff;
+      font-family: 'Playfair Display', serif;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+      background: transparent;
+      pointer-events: none;
+      transition: background 2s ease;
+    }
+
+    .red-1::before {
+      background: radial-gradient(ellipse at center, transparent 70%, rgba(255, 0, 0, 0.1) 100%);
+    }
+    .red-2::before {
+      background: radial-gradient(ellipse at center, transparent 60%, rgba(255, 0, 0, 0.15) 100%);
+    }
+    .red-3::before {
+      background: radial-gradient(ellipse at center, transparent 50%, rgba(255, 0, 0, 0.2) 100%);
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 1.8em;
+      padding: 20px 0;
+      z-index: 1;
+      position: relative;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      padding: 0 15px;
+    }
+
+    .left {
+      max-height: calc(100vh - 45vh);
+      overflow-y: auto;
+      z-index: 1;
+    }
+
+    .menu-title {
+      font-weight: bold;
+      font-size: 1.1em;
+      border-bottom: 1px solid #444;
+      margin-top: 20px;
+      padding-bottom: 5px;
+    }
+
+    .item {
+      margin: 15px 0;
+    }
+
+    label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px dashed #666;
+      padding: 5px 0;
+    }
+
+    .name-cn {
+      font-weight: bold;
+      margin-right: auto;
+    }
+
+    .item-english {
+      font-size: 0.9em;
+      color: #ccc;
+      font-style: italic;
+      font-family: 'Playfair Display', serif;
+    }
+
+    .checkbox {
+      margin-left: 10px;
+      transform: scale(1.2);
+    }
+
+    .right-overlay {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      max-height: 45vh;
+      overflow-y: auto;
+      background: rgba(17, 17, 17, 0.6);
+      backdrop-filter: blur(4px);
+      box-shadow: 0 -5px 20px rgba(255, 0, 0, 0.2);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px 20px 0 0;
+      padding: 20px;
+      z-index: 1;
+    }
+
+    #selectedList {
+      min-height: 100px;
+    }
+
+    .selected-item {
+      margin-bottom: 20px;
+    }
+
+    .selected-name {
+      font-weight: bold;
+    }
+
+    .selected-english {
+      font-size: 0.9em;
+      color: #ccc;
+      font-style: italic;
+      font-family: 'Playfair Display', serif;
+    }
+
+    .selected-desc {
+      color: #f9c;
+      font-size: 1em;
+      margin-top: 5px;
+      white-space: pre-wrap;
+    }
+
+    .response {
+      margin-top: 20px;
+      font-size: 1.1em;
+      color: #f9c;
+      text-align: center;
+    }
+
+    #doneButton {
+      display: block;
+      margin: 20px auto 0;
+      padding: 10px 20px;
+      font-size: 1em;
+      background-color: #222;
+      color: #fff;
+      border: 1px solid #555;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: 'Playfair Display', serif;
+    }
+
+    .overlay, .end-screen {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #000;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      font-size: 1.5em;
+      z-index: 9999;
+      white-space: pre-wrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 2s ease;
+    }
+
+    .overlay.show, .end-screen.show {
+      opacity: 1;
+      pointer-events: all;
+    }
+  </style>
+</head>
+<body>
+<h1>最后三杯</h1>
+<div class="container">
+  <div class="left">
+    <div class="menu-title">饮品类</div>
+    <div class="item">
+      <label><span class="name-cn">热拿铁</span><input class="checkbox" type="checkbox" value="热拿铁" onchange="handleCheck(this)"></label>
+      <div class="item-english">Hot Latte</div>
+    </div>
+    <div class="item">
+      <label><span class="name-cn">香草奶茶</span><input class="checkbox" type="checkbox" value="香草奶茶" onchange="handleCheck(this)"></label>
+      <div class="item-english">Vanilla Milk Tea</div>
+    </div>
+    <div class="item">
+      <label><span class="name-cn">柠檬气泡水</span><input class="checkbox" type="checkbox" value="柠檬气泡水" onchange="handleCheck(this)"></label>
+      <div class="item-english">Lemon Sparkling Water</div>
+    </div>
+
+    <div class="menu-title">甜点类</div>
+    <div class="item">
+      <label><span class="name-cn">记忆奶冻</span><input class="checkbox" type="checkbox" value="记忆奶冻" onchange="handleCheck(this)"></label>
+      <div class="item-english">Memory Pudding</div>
+    </div>
+    <div class="item">
+      <label><span class="name-cn">手工饼干拼盘</span><input class="checkbox" type="checkbox" value="手工饼干拼盘" onchange="handleCheck(this)"></label>
+      <div class="item-english">Homemade Cookie Set</div>
+    </div>
+    <div class="item">
+      <label><span class="name-cn">隐形纸杯蛋糕</span><input class="checkbox" type="checkbox" value="隐形纸杯蛋糕" onchange="handleCheck(this)"></label>
+      <div class="item-english">Invisible Cupcake</div>
+    </div>
+    <div class="item" style="height: 110px; border-bottom: none;"></div>
+</div>
+
+
+  <div class="right-overlay">
+    <div class="menu-title">你已选择</div>
+    <div id="selectedList"></div>
+    <button id="doneButton" onclick="submitOrder()">点完了</button>
+    <div class="response" id="finalResponse"></div>
+  </div>
+</div>
+
+<div class="overlay" id="blocker"></div>
+<div class="end-screen" id="waitScreen">很快就端上来啦，大概啦~</div>
+
+<script>
+  const descriptions = {
+    "热拿铁": "加了厚厚一层奶泡，刚端上桌时会微微起雾…诶？雾里好像有…",
+    "香草奶茶": "淡淡香草气息，令人怀念的温度，唤起令人怀念的记忆。",
+    "柠檬气泡水": "气泡上浮…哇，好像是幽灵形状呢！",
+    "记忆奶冻": "舌尖触到的一瞬间，回忆起谁似乎为你做过一模一样的甜点。",
+    "手工饼干拼盘": "三种口味，端上桌时播放的那盘老旧录音带，似乎有人听见了细语。",
+    "隐形纸杯蛋糕": "能闻见香气，尝得到甜味，但没人能看到它……或许店长可以？"
+  };
+
+  const englishNames = {
+    "热拿铁": "Hot Latte",
+    "香草奶茶": "Vanilla Milk Tea",
+    "柠檬气泡水": "Lemon Sparkling Water",
+    "记忆奶冻": "Memory Pudding",
+    "手工饼干拼盘": "Homemade Cookie Set",
+    "隐形纸杯蛋糕": "Invisible Cupcake"
+  };
+
+  const responses = [
+    "你的选择，我记下了。",
+    "——店长没有说话。她的影子晃了一下。",
+    "香气越来越浓了，你闻到了吗？"
+  ];
+
+  const blockTexts = [
+    "别贪心。世界只允许你选择三次。",
+    "菜单不再回应你了。",
+    "都说没有机会了ᗜ ˰ ᗜ。"
+  ];
+
+  let checkedItems = [];
+
+  function handleCheck(checkbox) {
+    const value = checkbox.value;
+    if (checkbox.checked) {
+      if (checkedItems.length >= 3) {
+        triggerBlocker();
+        checkbox.checked = false;
+        return;
+      }
+      checkedItems.push(value);
+    } else {
+      checkedItems = checkedItems.filter(item => item !== value);
+      const remove = document.getElementById('selected-' + value);
+      if (remove) remove.remove();
+    }
+
+    updateVisualFeedback();
+    if (checkbox.checked) appendItemToSelected(value);
+  }
+
+  function updateVisualFeedback() {
+    document.body.classList.remove('red-1', 'red-2', 'red-3');
+    if (checkedItems.length > 0 && checkedItems.length <= 3) {
+      document.body.classList.add('red-' + checkedItems.length);
+    }
+  }
+
+  function appendItemToSelected(item) {
+    if (document.getElementById('selected-' + item)) return;
+    const list = document.getElementById('selectedList');
+    const itemDiv = document.createElement('div');
+    itemDiv.className = 'selected-item';
+    itemDiv.id = 'selected-' + item;
+
+    const name = document.createElement('div');
+    name.className = 'selected-name';
+    name.textContent = item;
+
+    const en = document.createElement('div');
+    en.className = 'selected-english';
+    en.textContent = englishNames[item];
+
+    const desc = document.createElement('div');
+    desc.className = 'selected-desc';
+
+    itemDiv.appendChild(name);
+    itemDiv.appendChild(en);
+    itemDiv.appendChild(desc);
+    list.appendChild(itemDiv);
+
+    typeWriterEffect(desc, descriptions[item]);
+  }
+
+  function typeWriterEffect(element, text) {
+    let i = 0;
+    element.textContent = '';
+    const interval = setInterval(() => {
+      element.textContent += text.charAt(i);
+      i++;
+      if (i >= text.length) clearInterval(interval);
+    }, 40);
+  }
+
+  function triggerBlocker() {
+    const blocker = document.getElementById('blocker');
+    blocker.textContent = blockTexts[Math.floor(Math.random() * blockTexts.length)];
+    blocker.classList.add('show');
+  }
+
+  function submitOrder() {
+    if (checkedItems.length === 0) {
+      document.getElementById('finalResponse').textContent = "……你什么也没选。";
+      return;
+    }
+    document.getElementById('finalResponse').textContent =
+      responses[Math.floor(Math.random() * responses.length)];
+    document.getElementById('doneButton').disabled = true;
+    document.querySelectorAll('.checkbox').forEach(cb => cb.disabled = true);
+    setTimeout(() => {
+      document.getElementById('waitScreen').classList.add('show');
+    }, 2000);
+  }
+</script>
+</body>
+</html>
