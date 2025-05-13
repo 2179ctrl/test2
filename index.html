@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Last Three Cups</title>
+  <title>最后三杯（手机版）</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display&display=swap" rel="stylesheet" />
   <style>
     html, body {
@@ -101,12 +101,16 @@
       width: 100%;
       max-height: 45vh;
       overflow-y: auto;
+      overflow-x: hidden;
       background: rgba(17, 17, 17, 0.6);
       backdrop-filter: blur(4px);
       box-shadow: 0 -5px 20px rgba(255, 0, 0, 0.2);
       border-top: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 20px 20px 0 0;
-      padding: 20px;
+      padding:20px;
+      padding-left: 16px;
+      padding-right: 16px;
+      box-sizing: border-box;
       z-index: 1;
     }
 
@@ -134,6 +138,9 @@
       font-size: 1em;
       margin-top: 5px;
       white-space: pre-wrap;
+      box-sizing: border-box;
+      max-width: 100%;
+      word-break: break-word;
     }
 
     .response {
@@ -212,7 +219,7 @@
       <label><span class="name-cn">隐形纸杯蛋糕</span><input class="checkbox" type="checkbox" value="隐形纸杯蛋糕" onchange="handleCheck(this)"></label>
       <div class="item-english">Invisible Cupcake</div>
     </div>
-    <div class="item" style="height: 220px; border-bottom: none;"></div>
+    <div class="item" style="height: 150px; border-bottom: none;"></div>
 </div>
 
 
